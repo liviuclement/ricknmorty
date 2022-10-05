@@ -1,0 +1,75 @@
+.filters {
+
+  h2, p {
+    text-align: center;
+  }
+
+  .clearFilterButton {
+    color: #0d6efd;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .accordionBox {
+    border: 1px solid #c3c3c3;
+    border-radius: 4px;
+  }
+
+  .slice {
+    border-bottom: 1px solid #c3c3c3;
+    font-size: 18px;
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px;
+      cursor: pointer;
+
+      img {
+        width: 20px;
+        margin-top: 2px;
+      }
+
+      p {
+        margin: 0;
+      }
+    }
+
+    .header.opened {
+      background-color: #e7f1ff;
+
+      img {
+        transform: rotate(180deg);
+      }
+
+      p {
+        color: #0d6efd;
+      }
+    }
+
+    .content {
+      border-top: 1px solid #c3c3c3;
+      padding: 5px 20px;
+
+      button {
+        padding: 10px;
+        border: 1px solid #0d6efd;
+        border-radius: 4px;
+        color: #0d6efd;
+        background-color: white;
+        margin: 5px 10px;
+        cursor: pointer;
+
+        &.selected {
+          background-color: #0d6efd;
+          color: white;
+        }
+      }
+    }
+  }
+
+  .slice:last-of-type {
+    border: none;
+  }
+}

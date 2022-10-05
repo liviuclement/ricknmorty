@@ -1,0 +1,56 @@
+.character {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .characterContainer {
+    min-width: 300px;
+    width: min-content;
+  }
+
+  h1 {
+    font-size: 40px;
+    font-weight: 500;
+    margin: 0;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  img {
+    margin-top: 20px;
+    width: 100%;
+  }
+
+  .status {
+    margin: 15px 0 20px;
+    padding: 5px 0;
+    width: 100%;
+    color: white;
+    font-weight: 600;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 20px;
+
+    &.alive {
+      background-color: green;
+    }
+
+    &.dead {
+      background-color: #dc3545;
+    }
+
+    &.unknown {
+      background-color: #6c757d;
+    }
+  }
+
+  p {
+    font-weight: 600;
+    margin: 5px 0;
+    white-space: nowrap ;
+
+    span {
+      font-weight: 400;
+    }
+  }
+}
