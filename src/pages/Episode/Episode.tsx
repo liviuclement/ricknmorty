@@ -1,55 +1,61 @@
-import React, { ChangeEvent, ChangeEventHandler, useEffect, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import styles from './Episode.module.scss';
 import CharacterList from "../../components/CharacterList/CharacterList";
-import { useAppDispatch } from "../../app/hooks";
-import { getEpisode, getEpisodes } from "../../features/episodes/episodesSlice";
-import { useSelector } from "react-redux";
-import { createArrayOfLength } from "../../utils/utils";
-import { ReduxState } from "../../utils/types";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { getEpisodeById, getEpisodeCount } from "../../store/features/episodes/episodesSlice";
 
 const Episode = () => {
-    const [episode, setEpisode] = useState(1)
+    const [selectedEpisode, setSelectedEpisode] = useState(1)
     const dispatch = useAppDispatch();
-    const { episodes, episodeCount } = useSelector((state: ReduxState) => state.episodes);
+    const { episode, episodeCount, status } = useAppSelector((state) => state.episodes);
 
     const mapEpisodeOptions = () => {
-        const episodeArray = createArrayOfLength(1, episodeCount);
+        if (!episodeCount) return;
 
-        return episodeArray.map((episode: number) => <option
-            key={`ep-${episode}`}
-            value={episode}
-        >
-            Episode - {episode}
-        </option>)
+        const episodeArray = [];
+
+        for (let episode = 1; episode <= episodeCount; episode++) {
+            episodeArray.push(
+                <option
+                    key={`ep-${episode}`}
+                    value={episode}
+                >
+                    Location - {episode}
+                </option>
+            )
+        }
+
+        return episodeArray;
     }
 
     useEffect(() => {
-        dispatch(getEpisodes());
+        dispatch(getEpisodeCount());
     }, []);
 
     useEffect(() => {
-        dispatch(getEpisode({ episode }));
-    }, [episode]);
+        dispatch(getEpisodeById({ selectedEpisode }));
+    }, [selectedEpisode]);
 
-    const onEpisodeChange = (event: ChangeEvent<HTMLSelectElement>) => {
-        setEpisode(parseInt(event.target.value))
+    const episodeChangeHandler = (event: ChangeEvent<HTMLSelectElement>) => {
+        setSelectedEpisode(parseInt(event.target.value))
     }
 
     return (
         <div className={styles.episode}>
-            <h1>Episode name: <span>{episodes.name}</span></h1>
-            <p className={styles.airDate}>Air Date: {episodes.air_date}</p>
+            <h1>Episode name: <span>{episode.name}</span></h1>
+            <p className={styles.airDate}>Air Date: {episode.airDate}</p>
             <div className={styles.content}>
                 <div className={styles.filter}>
                     <h3>Pick Episode</h3>
                     <select
-                        onChange={onEpisodeChange}
+                        onChange={episodeChangeHandler}
                     >
                         {mapEpisodeOptions()}
                     </select>
                 </div>
                 <CharacterList
-                    characters={episodes.characters}
+                    characters={episode.characters}
+                    status={status}
                 />
             </div>
         </div>

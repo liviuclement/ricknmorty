@@ -1,25 +1,28 @@
 import React from 'react';
 import styles from './Header.module.scss'
-import { Link, RouteObject, useLocation } from "react-router-dom";
+import { NavLink } from "react-router-dom";
+import classNames from "classnames";
 
 const Header = () => {
-    const location = useLocation();
-
-    const isRoute = (route: string) => {
-        return location.pathname === route;
-    }
-
     return (
         <div className={styles.header}>
             <div className={styles.logo}>
-                <Link to={'/'}>
+                <NavLink to={'/'}>
                     Rick & Morty <span>Wiki</span>
-                </Link>
+                </NavLink>
             </div>
             <div className={styles.navigation}>
-                <Link to={'/'} className={isRoute('/') ? styles.active : ''}>Characters</Link>
-                <Link to={'/episodes'} className={isRoute('/episodes') ? styles.active : ''}>Episode</Link>
-                <Link to={'/location'} className={isRoute('/location') ? styles.active : ''}>Location</Link>
+                <NavLink
+                    to={'/'}
+                    className={({ isActive }) => classNames({ [styles.active]: isActive })}
+                    end
+                >Characters</NavLink>
+                <NavLink
+                    to={'/episodes'}
+                    className={({ isActive }) => classNames({ [styles.active]: isActive })}>Episode</NavLink>
+                <NavLink
+                    to={'/location'}
+                    className={({ isActive }) => classNames({ [styles.active]: isActive })}>Location</NavLink>
             </div>
         </div>
     );

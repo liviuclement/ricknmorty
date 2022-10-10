@@ -4,4 +4,19 @@
   gap: 20px;
   grid-auto-rows: min-content;
   margin-bottom: 50px;
+
+  .error {
+    position: absolute;
+    top: 100px;
+    width: 50%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 18px;
+    text-align: center;
+    background-color: rgb(254 242 242);
+    color: rgb(153 27 27);
+    border: 1px solid rgb(153 27 27);
+  }
 }

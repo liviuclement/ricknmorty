@@ -1,10 +1,11 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-import { Character } from "../../utils/types";
+import { Character } from "../../../utils/types";
+import { API_URL } from "../../../env";
 
-export const getEpisodes = createAsyncThunk('episodes/fetchEpisodes', async (args, { rejectWithValue }) => {
+export const getEpisodeCount = createAsyncThunk('episodes/fetchEpisodeCount', async (args, { rejectWithValue }) => {
     try {
-        const response = await axios(`https://rickandmortyapi.com/api/episode`);
+        const response = await axios(`${API_URL}/episode`);
 
         return {
             count: response.data?.info?.count
@@ -14,16 +15,16 @@ export const getEpisodes = createAsyncThunk('episodes/fetchEpisodes', async (arg
     }
 })
 
-export const getEpisode = createAsyncThunk('episodes/fetchEpisode', async (args: { episode: number }, { rejectWithValue }) => {
-    const { episode } = args;
+export const getEpisodeById = createAsyncThunk('episodes/fetchCharactersByEpisodeId', async (args: { selectedEpisode: number }, { rejectWithValue }) => {
+    const { selectedEpisode } = args;
 
     try {
-        const response = await axios(`https://rickandmortyapi.com/api/episode/${episode || ''}`);
+        const response = await axios(`${API_URL}/episode/${selectedEpisode}`);
         const characterPromises = await response.data.characters.map((character: string) => axios.get(character))
         const characters = await Promise.all(characterPromises);
 
         return {
-            air_date: response.data.air_date,
+            airDate: response.data.air_date,
             created: response.data.created,
             episode: response.data.episode,
             name: response.data.name,
@@ -35,9 +36,9 @@ export const getEpisode = createAsyncThunk('episodes/fetchEpisode', async (args:
     }
 })
 
-export interface InitialState {
-    episodes: {
-        air_date: string,
+interface EpisodesState {
+    episode: {
+        airDate: string,
         created: string,
         episode: string,
         name: string,
@@ -45,13 +46,13 @@ export interface InitialState {
         characters: Character[],
     },
     status: string,
-    error: string | null,
-    episodeCount: number | null,
+    error: string,
+    episodeCount: number,
 }
 
-const initialState: InitialState = {
-    episodes: {
-        air_date: '',
+const initialState: EpisodesState = {
+    episode: {
+        airDate: '',
         created: '',
         episode: '',
         name: '',
@@ -59,8 +60,8 @@ const initialState: InitialState = {
         characters: [],
     },
     status: 'idle',
-    error: null,
-    episodeCount: null,
+    error: '',
+    episodeCount: 0,
 }
 
 export const episodesSlice = createSlice({
@@ -69,27 +70,27 @@ export const episodesSlice = createSlice({
     reducers: {},
     extraReducers: builder => {
         builder
-            .addCase(getEpisodes.pending, (state) => {
+            .addCase(getEpisodeCount.pending, (state) => {
                 state.status = 'loading';
             })
-            .addCase(getEpisodes.fulfilled, (state, action) => {
+            .addCase(getEpisodeCount.fulfilled, (state, action) => {
                 const { count } = action.payload;
 
-                state.status = 'idle';
+                state.status = 'succeeded';
                 state.episodeCount = count;
             })
-            .addCase(getEpisodes.rejected, (state, action) => {
+            .addCase(getEpisodeCount.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.payload as string;
             })
-            .addCase(getEpisode.pending, (state) => {
+            .addCase(getEpisodeById.pending, (state) => {
                 state.status = 'loading';
             })
-            .addCase(getEpisode.fulfilled, (state, action) => {
-                state.status = 'idle';
-                state.episodes = action.payload;
+            .addCase(getEpisodeById.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                state.episode = action.payload;
             })
-            .addCase(getEpisode.rejected, (state, action) => {
+            .addCase(getEpisodeById.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.payload as string;
             })

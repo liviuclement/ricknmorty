@@ -1,14 +1,15 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-import { Character } from "../../utils/types";
+import { Character } from "../../../utils/types";
+import { API_URL } from "../../../env";
 
 export const getCharacters = createAsyncThunk('characters/fetchCharacters',
-    async (args: { statusFilter: string, speciesFilter: string, genderFilter: string, page: number }, {
+    async (args: { statusFilter: string, speciesFilter: string, genderFilter: string, nameFilter: string, page: number,  }, {
         rejectWithValue
     }) => {
-        const { statusFilter, speciesFilter, genderFilter, page } = args;
+        const { statusFilter, speciesFilter, genderFilter, nameFilter, page } = args;
         try {
-            const { data } = await axios(`https://rickandmortyapi.com/api/character?page=${page}&status=${statusFilter || ''}&gender=${genderFilter || ''}&species=${speciesFilter || ''}`);
+            const { data } = await axios(`${API_URL}/character?page=${page}&status=${statusFilter}&gender=${genderFilter}&species=${speciesFilter}&name=${nameFilter}`);
 
             return {
                 data: {
@@ -37,7 +38,7 @@ export const getCharacter = createAsyncThunk('characters/fetchCharacter',
     }) => {
         const { character } = args;
         try {
-            const { data } = await axios(`https://rickandmortyapi.com/api/character/${character}`);
+            const { data } = await axios(`${API_URL}/character/${character}`);
 
             return {
                 id: data.id,
@@ -54,7 +55,7 @@ export const getCharacter = createAsyncThunk('characters/fetchCharacter',
         }
     });
 
-export interface InitialState {
+interface CharactersState {
     characters: {
         info: {
             count: number,
@@ -69,7 +70,7 @@ export interface InitialState {
     error: string,
 }
 
-const initialState: InitialState = {
+const initialState: CharactersState = {
     characters: {
         info: {
             count: 0,
@@ -95,7 +96,7 @@ export const charactersSlice = createSlice({
             })
             .addCase(getCharacters.fulfilled, (state, action) => {
                 const { data, page } = action.payload;
-                state.status = 'idle';
+                state.status = 'succeeded';
 
                 if (page > 1) {
                     state.characters = {
@@ -108,19 +109,19 @@ export const charactersSlice = createSlice({
             })
             .addCase(getCharacters.rejected, (state, action) => {
                 state.status = 'failed';
-                state.error = action.payload as any;
+                state.error = action.payload as string;
                 state.characters = initialState.characters;
             })
             .addCase(getCharacter.pending, (state) => {
                 state.status = 'loading';
             })
             .addCase(getCharacter.fulfilled, (state, action) => {
-                state.status = 'idle';
+                state.status = 'succeeded';
                 state.character = action.payload;
             })
             .addCase(getCharacter.rejected, (state, action) => {
                 state.status = 'failed';
-                state.error = action.payload as any;
+                state.error = action.payload as string;
             })
     }
 })

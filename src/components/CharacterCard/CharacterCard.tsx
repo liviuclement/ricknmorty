@@ -1,20 +1,23 @@
-import React, { ForwardedRef, forwardRef } from 'react';
+import React from 'react';
 import styles from "./CharacterCard.module.scss";
-import { Link } from "react-router-dom";
 
 interface Props {
-    id: number,
+    onClick: () => void
     image: string,
     status: string,
     name: string,
     locationName: string
 }
 
-const CharacterCard = forwardRef((props: Props, ref: ForwardedRef<any>) => {
-    const { id, image, status, name, locationName } = props;
+const CharacterCard = (props: Props) => {
+    const { image, status, name, locationName, onClick } = props;
 
-    const cardContent = <>
+    return <div
+        className={styles.card}
+        onClick={onClick}
+    >
         <img
+            alt={'img'}
             src={image}
         />
         <div
@@ -29,22 +32,8 @@ const CharacterCard = forwardRef((props: Props, ref: ForwardedRef<any>) => {
                 {locationName}
             </p>
         </div>
-    </>
-
-    return ref ? <Link
-        ref={ref}
-        className={styles.card}
-        to={`/character/${id}`}
-    >
-        {cardContent}
-    </Link> : <Link
-        className={styles.card}
-        to={`/character/${id}`}
-    >
-        {cardContent}
-    </Link>
-
-});
+    </div>
+};
 
 CharacterCard.displayName = 'CharacterCard';
 

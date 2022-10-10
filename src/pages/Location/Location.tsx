@@ -1,45 +1,50 @@
 import React, { ChangeEvent, useEffect, useState } from 'react';
 import styles from './Location.module.scss';
 import CharacterList from "../../components/CharacterList/CharacterList";
-import { useAppDispatch } from "../../app/hooks";
-import { useSelector } from "react-redux";
-import { createArrayOfLength } from "../../utils/utils";
-import { getLocation, getLocations } from "../../features/locations/locationsSlice";
-import { ReduxState } from "../../utils/types";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { getLocationById, getLocationCount } from "../../store/features/locations/locationsSlice";
 
 const Location = () => {
-    const [location, setLocation] = useState(1)
+    const [selectedLocation, setSelectedLocation] = useState(1)
     const dispatch = useAppDispatch();
-    const { locations, locationCount } = useSelector((state: ReduxState) => state.locations);
+    const { location, locationCount, status } = useAppSelector((state) => state.locations);
 
     const mapLocationOptions = () => {
-        const locationArray = createArrayOfLength(1, locationCount);
+        if (!locationCount) return;
 
-        return locationArray.map((location: number) => <option
-            key={`ep-${location}`}
-            value={location}
-        >
-            Location - {location}
-        </option>)
+        const locationArray = [];
+
+        for (let location = 1; location <= locationCount; location++) {
+            locationArray.push(
+                <option
+                    key={`ep-${location}`}
+                    value={location}
+                >
+                    Location - {location}
+                </option>
+            )
+        }
+
+        return locationArray;
     }
 
     useEffect(() => {
-        dispatch(getLocations());
+        dispatch(getLocationCount());
     }, []);
 
     useEffect(() => {
-        dispatch(getLocation({ location }));
-    }, [location]);
+        dispatch(getLocationById({ selectedLocation }));
+    }, [selectedLocation]);
 
     const onLocationChange = (event: ChangeEvent<HTMLSelectElement>) => {
-        setLocation(parseInt(event.target.value))
+        setSelectedLocation(parseInt(event.target.value))
     }
 
     return (
         <div className={styles.location}>
-            <h1>Location: <span>{locations.name}</span></h1>
-            <p className={styles.dimension}>Dimension: {locations.dimension}</p>
-            <p className={styles.type}>Type: {locations.type}</p>
+            <h1>Location: <span>{location.name}</span></h1>
+            <p className={styles.dimension}>Dimension: {location.dimension}</p>
+            <p className={styles.type}>Type: {location.type}</p>
             <div className={styles.content}>
                 <div className={styles.filter}>
                     <h3>Pick Location</h3>
@@ -50,7 +55,8 @@ const Location = () => {
                     </select>
                 </div>
                 <CharacterList
-                    characters={locations.residents}
+                    characters={location.residents}
+                    status={status}
                 />
             </div>
         </div>

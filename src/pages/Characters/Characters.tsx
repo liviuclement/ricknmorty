@@ -2,17 +2,17 @@ import React, { useEffect, useState } from 'react';
 import styles from './Characters.module.scss';
 import CharactersFilter from "../../components/Filters/CharactersFilter";
 import CharacterList from "../../components/CharacterList/CharacterList";
-import { useSelector } from "react-redux";
-import { useAppDispatch } from "../../app/hooks";
-import { getCharacters } from "../../features/characters/charactersSlice";
-import { ReduxState } from "../../utils/types";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { getCharacters } from "../../store/features/characters/charactersSlice";
 
 const Characters = () => {
     const [page, setPage] = useState(1);
     const [statusFilter, setStatusFilter] = useState('');
     const [speciesFilter, setSpeciesFilter] = useState('');
     const [genderFilter, setGenderFilter] = useState('');
-    const { characters, status } = useSelector((state: ReduxState) => state.characters);
+    const [nameFilter, setNameFilter] = useState('');
+    const [nameFilterTimeout, setNameFilterTimeout] = useState<any>();
+    const { characters, status } = useAppSelector((state) => state.characters);
     const { results, info, } = characters;
     const { next, } = info;
     const dispatch = useAppDispatch();
@@ -21,40 +21,67 @@ const Characters = () => {
         window.addEventListener('scroll', scrollCallback);
 
         return () => window.removeEventListener('scroll', scrollCallback)
-    }, [next])
+    }, [])
 
     const scrollCallback = () => {
-        if (status === 'loading') return;
-
         const scrollHeight = window.document.documentElement.scrollHeight
         const scrollTop = window.document.documentElement.scrollTop
         const clientHeight = window.document.documentElement.clientHeight
 
-        if (scrollTop > 0.99 * (scrollHeight - clientHeight) && next) {
+        if (scrollTop > 0.99 * (scrollHeight - clientHeight)) {
             setPage(prevPage => prevPage + 1);
         }
     }
 
     useEffect(() => {
-        const filters = { statusFilter, speciesFilter, genderFilter, page };
+        if (page > 1 && !next || status === 'loading') return;
+
+        const filters = { statusFilter, speciesFilter, genderFilter, nameFilter, page };
 
         dispatch(getCharacters(filters));
     }, [statusFilter, speciesFilter, genderFilter, page])
 
+    const onFilterChange = (type: string, filter: string) => {
+        let timeout;
 
-    const onStatusFilterChange = (filter: string) => () => {
-        setStatusFilter(filter);
+        switch (type) {
+            case 'status':
+                setStatusFilter(filter);
+                break;
+            case 'species':
+                setSpeciesFilter(filter);
+                break;
+            case 'gender':
+                setGenderFilter(filter);
+                break;
+            case 'name':
+                setNameFilter(filter);
+
+                if(nameFilterTimeout) {
+                    clearTimeout(nameFilterTimeout)
+                }
+
+                timeout = setTimeout(() => {
+                    const filters = { statusFilter, speciesFilter, genderFilter, nameFilter: filter, page, };
+
+                    dispatch(getCharacters(filters));
+                }, 250);
+
+                setNameFilterTimeout(timeout);
+                break;
+            case 'all':
+                setStatusFilter(filter);
+                setSpeciesFilter(filter);
+                setGenderFilter(filter);
+        }
+
         setPage(1);
     }
 
-    const onSpeciesFilterChange = (filter: string) => () => {
-        setSpeciesFilter(filter);
-        setPage(1);
-    }
-
-    const onGenderFilterChange = (filter: string) => () => {
-        setGenderFilter(filter);
-        setPage(1);
+    const filters = {
+        status: statusFilter,
+        species: speciesFilter,
+        gender: genderFilter,
     }
 
     return (
@@ -63,20 +90,19 @@ const Characters = () => {
             <div className={styles.searchBar}>
                 <input
                     placeholder={'Search for characters'}
+                    onChange={(event) => onFilterChange('name', event.target.value)}
+                    value={nameFilter}
                 />
                 <button>Search</button>
             </div>
             <div className={styles.content}>
                 <CharactersFilter
-                    setStatusFilter={onStatusFilterChange}
-                    setSpeciesFilter={onSpeciesFilterChange}
-                    setGenderFilter={onGenderFilterChange}
-                    statusFilter={statusFilter}
-                    speciesFilter={speciesFilter}
-                    genderFilter={genderFilter}
+                    onFilterChange={onFilterChange}
+                    filters={filters}
                 />
                 <CharacterList
                     characters={results}
+                    status={status}
                 />
             </div>
         </div>
