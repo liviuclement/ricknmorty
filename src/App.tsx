@@ -1,16 +1,15 @@
 import React from 'react';
-import './App.scss';
+import styles from './App.module.scss';
 import {
     Outlet,
 } from "react-router-dom";
 import Header from "./components/Header/Header";
 
-
 function App() {
     return (
-        <div className="App">
+        <div className={styles.app}>
             <Header/>
-            <div className='main-container'>
+            <div className={styles.mainContainer}>
                 <Outlet/>
             </div>
         </div>

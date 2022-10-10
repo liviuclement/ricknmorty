@@ -6,7 +6,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import './index.scss';
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import ErrorPage from "./components/ErrorPage";
+import ErrorPage from "./pages/ErrorPage/ErrorPage";
 import Characters from "./pages/Characters/Characters";
 import Episode from "./pages/Episode/Episode";
 import Location from "./pages/Location/Location";

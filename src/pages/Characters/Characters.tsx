@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './Characters.module.scss';
 import CharactersFilter from "../../components/Filters/CharactersFilter";
 import CharacterList from "../../components/CharacterList/CharacterList";
@@ -15,8 +15,25 @@ const Characters = () => {
     const { characters, status } = useSelector((state: ReduxState) => state.characters);
     const { results, info, } = characters;
     const { next, } = info;
-    const intersectionObserver = useRef<IntersectionObserver>();
     const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        window.addEventListener('scroll', scrollCallback);
+
+        return () => window.removeEventListener('scroll', scrollCallback)
+    }, [next])
+
+    const scrollCallback = () => {
+        if (status === 'loading') return;
+
+        const scrollHeight = window.document.documentElement.scrollHeight
+        const scrollTop = window.document.documentElement.scrollTop
+        const clientHeight = window.document.documentElement.clientHeight
+
+        if (scrollTop > 0.99 * (scrollHeight - clientHeight) && next) {
+            setPage(prevPage => prevPage + 1);
+        }
+    }
 
     useEffect(() => {
         const filters = { statusFilter, speciesFilter, genderFilter, page };
@@ -24,22 +41,6 @@ const Characters = () => {
         dispatch(getCharacters(filters));
     }, [statusFilter, speciesFilter, genderFilter, page])
 
-    const lastCardRef = useCallback((post: HTMLElement) => {
-        if (status === 'loading') return;
-
-        if (intersectionObserver.current) {
-
-            intersectionObserver.current.disconnect();
-        }
-
-        intersectionObserver.current = new IntersectionObserver(posts => {
-            if (posts[0].isIntersecting && next) {
-                setPage(prevPage => prevPage + 1);
-            }
-        })
-
-        if (post) intersectionObserver.current.observe(post);
-    }, [status, next]);
 
     const onStatusFilterChange = (filter: string) => () => {
         setStatusFilter(filter);
@@ -76,7 +77,6 @@ const Characters = () => {
                 />
                 <CharacterList
                     characters={results}
-                    ref={lastCardRef}
                 />
             </div>
         </div>

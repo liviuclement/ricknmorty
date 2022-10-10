@@ -46,4 +46,6 @@ const CharacterCard = forwardRef((props: Props, ref: ForwardedRef<any>) => {
 
 });
 
+CharacterCard.displayName = 'CharacterCard';
+
 export default CharacterCard;
