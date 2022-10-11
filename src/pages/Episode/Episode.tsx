@@ -3,30 +3,14 @@ import styles from './Episode.module.scss';
 import CharacterList from "../../components/CharacterList/CharacterList";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { getEpisodeById, getEpisodeCount } from "../../store/features/episodes/episodesSlice";
+import { getSelectOptionsByAttribute } from "../../utils/utils";
+import CustomSelect from "../../components/Filters/CustomSelect";
 
 const Episode = () => {
     const [selectedEpisode, setSelectedEpisode] = useState(1)
     const dispatch = useAppDispatch();
     const { episode, episodeCount, status } = useAppSelector((state) => state.episodes);
-
-    const mapEpisodeOptions = () => {
-        if (!episodeCount) return;
-
-        const episodeArray = [];
-
-        for (let episode = 1; episode <= episodeCount; episode++) {
-            episodeArray.push(
-                <option
-                    key={`ep-${episode}`}
-                    value={episode}
-                >
-                    Location - {episode}
-                </option>
-            )
-        }
-
-        return episodeArray;
-    }
+    const episodeOptions = getSelectOptionsByAttribute('Episode', episodeCount);
 
     useEffect(() => {
         dispatch(getEpisodeCount());
@@ -47,11 +31,7 @@ const Episode = () => {
             <div className={styles.content}>
                 <div className={styles.filter}>
                     <h3>Pick Episode</h3>
-                    <select
-                        onChange={episodeChangeHandler}
-                    >
-                        {mapEpisodeOptions()}
-                    </select>
+                    <CustomSelect options={episodeOptions} onChange={episodeChangeHandler}/>
                 </div>
                 <CharacterList
                     characters={episode.characters}

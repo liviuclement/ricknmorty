@@ -3,30 +3,14 @@ import styles from './Location.module.scss';
 import CharacterList from "../../components/CharacterList/CharacterList";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { getLocationById, getLocationCount } from "../../store/features/locations/locationsSlice";
+import { getSelectOptionsByAttribute } from "../../utils/utils";
+import CustomSelect from "../../components/Filters/CustomSelect";
 
 const Location = () => {
     const [selectedLocation, setSelectedLocation] = useState(1)
     const dispatch = useAppDispatch();
     const { location, locationCount, status } = useAppSelector((state) => state.locations);
-
-    const mapLocationOptions = () => {
-        if (!locationCount) return;
-
-        const locationArray = [];
-
-        for (let location = 1; location <= locationCount; location++) {
-            locationArray.push(
-                <option
-                    key={`ep-${location}`}
-                    value={location}
-                >
-                    Location - {location}
-                </option>
-            )
-        }
-
-        return locationArray;
-    }
+    const locationOptions = getSelectOptionsByAttribute('Location', locationCount || 0);
 
     useEffect(() => {
         dispatch(getLocationCount());
@@ -48,11 +32,10 @@ const Location = () => {
             <div className={styles.content}>
                 <div className={styles.filter}>
                     <h3>Pick Location</h3>
-                    <select
+                    <CustomSelect
+                        options={locationOptions}
                         onChange={onLocationChange}
-                    >
-                        {mapLocationOptions()}
-                    </select>
+                    />
                 </div>
                 <CharacterList
                     characters={location.residents}

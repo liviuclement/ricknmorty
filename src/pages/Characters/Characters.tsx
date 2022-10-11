@@ -62,7 +62,7 @@ const Characters = () => {
                 }
 
                 timeout = setTimeout(() => {
-                    const filters = { statusFilter, speciesFilter, genderFilter, nameFilter: filter, page, };
+                    const filters = { statusFilter, speciesFilter, genderFilter, nameFilter: filter, page: 1, };
 
                     dispatch(getCharacters(filters));
                 }, 250);

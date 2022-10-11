@@ -19,15 +19,14 @@ export const getLocationById = createAsyncThunk('locations/fetchLocation', async
     const { selectedLocation } = args;
 
     try {
-        const response = await axios(`${API_URL}/location/${selectedLocation}`);
-        const residentPromises = await response.data.residents.map((resident: string) => axios.get(resident))
+        const response = await axios.get<GetLocationResponse>(`${API_URL}/location/${selectedLocation}`);
+        const residentPromises = response.data.residents.map((resident: string) => axios.get<Character>(resident))
         const residents = await Promise.all(residentPromises);
 
         return {
             type: response.data.type,
             dimension: response.data.dimension,
             name: response.data.name,
-            residentsURL: response.data.locations,
             residents: residents?.map(resident => resident.data),
         };
     } catch (err: any) {
@@ -35,11 +34,17 @@ export const getLocationById = createAsyncThunk('locations/fetchLocation', async
     }
 })
 
+interface GetLocationResponse {
+    type: string,
+    dimension: string,
+    name: string,
+    residents: string[],
+}
+
 interface Location {
     type: string,
     dimension: string,
     name: string,
-    residentsURL: string[],
     residents: Character[],
 }
 
@@ -55,7 +60,6 @@ const initialState: LocationsState = {
         type: '',
         dimension: '',
         name: '',
-        residentsURL: [],
         residents: [],
     },
     status: 'idle',
