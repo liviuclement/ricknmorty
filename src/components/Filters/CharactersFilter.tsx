@@ -1,26 +1,12 @@
 import React  from 'react';
 import styles from './CharactersFilter.module.scss'
 import FiltersAccordion from "./FiltersAccordion";
+import { accordionSlices } from "../../utils/constants";
 
 interface Props {
     filters: { [key: string]: string },
     onFilterChange: (type: string, filter: string) => void,
 }
-
-const accordionSlices = [
-    {
-        name: 'status',
-        filters: ['Alive', 'Dead', 'Unknown'],
-    },
-    {
-        name: 'species',
-        filters: ['Human', 'Alien', 'Humanoid', 'Poopybutthole', 'Mythological', 'Unknown', 'Animal', 'Disease', 'Robot', 'Cronenberg', 'Planet'],
-    },
-    {
-        name: 'gender',
-        filters: ['female', 'male', 'genderless', 'unknown'],
-    }
-]
 
 const CharactersFilter = (props: Props) => {
     const { filters, onFilterChange } = props;

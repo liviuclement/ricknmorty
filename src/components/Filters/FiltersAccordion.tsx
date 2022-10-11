@@ -43,7 +43,7 @@ const FiltersAccordion = (props: Props) => {
                             openedAccordionSlice === slice.name &&
 							<div className={styles.content}>
                                 {
-                                    slice.filters.map((filter: string) => (
+                                    slice.filters.map((filter) => (
                                         <button
                                             key={`filter-${filter}`}
                                             className={classNames({ [styles.selected]: filters[slice.name] === filter })}
